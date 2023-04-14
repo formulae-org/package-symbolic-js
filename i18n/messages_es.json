@@ -1,0 +1,42 @@
+{
+	"pathSymbolic" : "Simbólico",
+
+	"nameSymbol"   : "Símbolo",
+	"enterSymbol"  : "Introduzca el nombre del símbolo",
+	"updateSymbol" : "Actualice el nombre del símbolo",
+	"leafSymbol"   : "Símbolo",
+
+	"operatorAssignment" : "←",
+	"nameAssignment"     : "Asignación",
+	"childrenAssignment" : [ "Símbolo", "Expresión a asignar" ],
+	"leafAssignment"     : "Asignación",
+
+	"nameLocal"    : "Asignación local",
+	"literalLocal" : "LOCAL",
+	"leafLocal"    : "Local",
+
+	"nameFunction"     : "Función",
+	"childrenFunction" : [ "Función", "Lista de argumentos de la función" ],
+	"leafFunction"     : "Función",
+
+	"operatorLambda" : "⟼",
+	"nameLambda"     : "Expresión lambda",
+	"childrenLambda" : [ "Lista de parámetros", "Cuerpo de la expresión lambda" ],
+	"leafLambda"     : "Expresión lambda",
+
+	"nameLambdaBuilder" : "Constructor lambda",
+	"leafLambdaBuilder" : "Constructor lambda",
+
+	"nameLambdaApplication"     : "Aplicación lambda",
+	"childrenLambdaApplication" : [ "Expression lambda", "Parámeteros a aplicar" ],
+	"leafLambdaApplication"     : "Aplicación lambda",
+
+	"nameReturn"     : "Regresar",
+	"mnemonicReturn" : "Regresar",
+	"leafReturn"     : "Regresar",
+
+	"nameUndefine"     : "Indefinición",
+	"mnemonicUndefine" : "Indefinir",
+	"leafUndefine"     : "Indefinición"
+}
+

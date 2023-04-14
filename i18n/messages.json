@@ -1,0 +1,42 @@
+{
+	"pathSymbolic" : "Symbolic",
+
+	"nameSymbol"   : "Symbol",
+	"enterSymbol"  : "Enter the name of the symbol",
+	"updateSymbol" : "Update the name of the symbol",
+	"leafSymbol"   : "Symbol",
+
+	"operatorAssignment" : "←",
+	"nameAssignment"     : "Assignment",
+	"childrenAssignment" : [ "The symbol", "Expression to be assigned" ],
+	"leafAssignment"     : "Assignment",
+
+	"nameLocal"    : "Local assignment",
+	"literalLocal" : "LOCAL",
+	"leafLocal"    : "Local",
+
+	"nameFunction"     : "Function",
+	"childrenFunction" : [ "The function", "A list of arguments of the function" ],
+	"leafFunction"     : "Function",
+
+	"operatorLambda" : "⟼",
+	"nameLambda"     : "Lambda",
+	"childrenLambda" : [ "List of parameters of the lambda expression", "Body of lambda expression" ],
+	"leafLambda"     : "Lambda",
+
+	"nameLambdaBuilder" : "Lambda builder",
+	"leafLambdaBuilder" : "Lambda builder",
+
+	"nameLambdaApplication"     : "Lambda application",
+	"childrenLambdaApplication" : [ "Lambda expression", "Parameters to be applied" ],
+	"leafLambdaApplication"     : "Lambda application",
+
+	"nameReturn"     : "Return",
+	"mnemonicReturn" : "Return",
+	"leafReturn"     : "Return",
+
+	"nameUndefine"     : "Undefinition",
+	"mnemonicUndefine" : "Undefine",
+	"leafUndefine"     : "Undefine"
+}
+
