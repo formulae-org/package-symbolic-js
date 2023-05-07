@@ -743,7 +743,7 @@ Symbolic.replaceSymbol = (expr, from, to) => {
 Symbolic.lambdaBuilderReducer = async (lambdaCreation, session) => {
 	let args = lambdaCreation.children[0];
 	if (args.getTag() !== "List.List") {
-		ReductionManager.setInError(arguments, "Expression must be a list");
+		ReductionManager.setInError(args, "Expression must be a list");
 		throw new ReductionError();
 	}
 	
