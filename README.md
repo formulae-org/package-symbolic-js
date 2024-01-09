@@ -1,6 +1,6 @@
 # package-symbolic-js
 
-Symbolic arithmetic package for the [Fōrmulæ](https://formulae.org) programming language.
+Symbolic package for the [Fōrmulæ](https://formulae.org) programming language.
 
 Fōrmulæ is also a software framework for visualization, edition and manipulation of complex expressions, from many fields. The code for an specific field —i.e. arithmetics— is encapsulated in a single unit called a Fōrmulæ **package**.
 
