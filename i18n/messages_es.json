@@ -12,7 +12,7 @@
 	"leafAssignment"     : "Asignación",
 
 	"nameLocal"    : "Asignación local",
-	"literalLocal" : "LOCAL",
+	"literalLocal" : "local",
 	"leafLocal"    : "Local",
 
 	"nameFunction"     : "Función",
@@ -31,9 +31,9 @@
 	"childrenLambdaApplication" : [ "Expression lambda", "Parámeteros a aplicar" ],
 	"leafLambdaApplication"     : "Aplicación lambda",
 
-	"nameReturn"     : "Regresar",
-	"mnemonicReturn" : "Regresar",
-	"leafReturn"     : "Regresar",
+	"nameReturn"    : "Regresar",
+	"literalReturn" : "regresar",
+	"leafReturn"    : "Regresar",
 
 	"nameUndefine"     : "Indefinición",
 	"mnemonicUndefine" : "Indefinir",

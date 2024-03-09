@@ -380,10 +380,13 @@ Symbolic.cardinalitySymbolReducer = async (count, session) => {
 		throw new ReductionError();
 	}
 	
-	let result = CanonicalArithmetic.number2Expr(
-		entry.getValue().children.length
+	count.replaceBy(
+		CanonicalArithmetic.canonical2InternalNumber(
+			new CanonicalArithmetic.Integer(
+				BigInt(entry.getValue().children.length)
+			)
+		)
 	);
-	count.replaceBy(result);
 	//session.log("Cardinality retrieved");
 	return true;
 };
@@ -417,9 +420,14 @@ Symbolic.cardinalityChildSymbolReducer = async (count, session) => {
 		throw new ReductionError();
 	}
 	
-	let result = CanonicalArithmetic.number2Expr(x.children.length); 
-	count.replaceBy(result);
-	//session.log("Cardinality retrieved");
+	count.replaceBy(
+		CanonicalArithmetic.canonical2InternalNumber(
+			new CanonicalArithmetic.Integer(
+				BigInt(x.children.length)
+			)
+		)
+	);
+	
 	return true;
 };
 	
@@ -430,9 +438,9 @@ Symbolic.returnReducer = async (expr, session) => {
 // Append(symbol, expr)[special, high]
 
 // it must be special in order to prevent symbol reduction
-// It must be high precedence to have priority over other forms, specially Expression.Append(expr1, expr2)
+// It must be high precedence to have priority over other forms, specially Expression.Append(e1, e2)
 //
-// See: Expression.Append(expr1, expr2)
+// See: Expression.Append(e1, e2)
 	
 Symbolic.appendSymbolReducer = async (_append, session) => {
 	let symbol = _append.children[0];
@@ -463,9 +471,9 @@ Symbolic.appendSymbolReducer = async (_append, session) => {
 	
 // Prepend(symbol, expr)[special, high]
 // it must be special in order to prevent symbol reduction
-// It must be high precedence to have priority over other forms, specially Expression.Prepend(expr1, expr2)
+// It must be high precedence to have priority over other forms, specially Expression.Prepend(e1, e2)
 //
-// See: Expression.Prepend(expr1, expr2)
+// See: Expression.Prepend(e1, e2)
 	
 Symbolic.prependSymbolReducer = async (prepend, session) => {
 	let symbol = prepend.children[0];
@@ -496,9 +504,9 @@ Symbolic.prependSymbolReducer = async (prepend, session) => {
 	
 // Insert(symbol, expr, pos)
 // it must be special in order to prevent symbol reduction
-// It must be high precedence to have priority over other forms, specially Expression.Insert(expr1, expr2, pos)
+// It must be high precedence to have priority over other forms, specially Expression.Insert(e1, e2, pos)
 //
-// See: Expression.Insert(expr1, expr2, pos)
+// See: Expression.Insert(e1, e2, pos)
 	
 Symbolic.insertSymbolReducer = async (insert, session) => {
 	// symbol
@@ -775,7 +783,7 @@ Symbolic.lambdaBuilderReducer = async (lambdaCreation, session) => {
 };
 	
 // Assignment pitfall reducer
-// Assignment(expr1, expr2)[low]
+// Assignment(e1, e2)[low]
 // It must be low precedence to be a pitfall for no valid forms of assignment
 	
 Symbolic.assignmentPitfallReducer = async (assignmentExpression, session) => {

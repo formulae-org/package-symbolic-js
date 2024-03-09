@@ -66,7 +66,24 @@ Symbolic.Symbol = class extends Expression.Literal {
 	isReduced() {
 		return false;
 	}
-
+	
+	prepareDisplay(context) {
+		let bkp = context.fontInfo.italic;
+		context.fontInfo.setItalic(context, true);
+		
+		this.prepareDisplayAsLiteral(context);
+		
+		context.fontInfo.setItalic(context, bkp);
+	}
+	
+	display(context, x, y) {
+		let bkp = context.fontInfo.italic;
+		context.fontInfo.setItalic(context, true);
+		
+		this.displayAsLiteral(context, x, y);
+		
+		context.fontInfo.setItalic(context, bkp);
+	}
 }
 
 Symbolic.FunctionExpression = class extends Expression.BinaryExpression {
@@ -189,7 +206,8 @@ Symbolic.setExpressions = function(module) {
 	// assignment
 	Formulae.setExpression(
 		module,
-		"Symbolic.Assignment", {
+		"Symbolic.Assignment",
+		{
 			clazz:        Expression.Infix,
 			getTag:       () => "Symbolic.Assignment",
 			getOperator:  () => this.messages.operatorAssignment,
@@ -198,38 +216,67 @@ Symbolic.setExpressions = function(module) {
 			parentheses:  false,
 			inverted:     true,
 			min: 2, max: 2
-	});
+		}
+	);
 	
 	// local
 	Formulae.setExpression(
 		module,
-		"Symbolic.Local",  {
-		clazz:       Expression.PrefixedLiteral,
-		getTag:      () => "Symbolic.Local",
-		getLiteral:  () => this.messages.literalLocal,
-		getName:     () => this.messages.nameLocal,
-		color:       "orange",
-		parentheses: false
-	});
+		"Symbolic.Local",
+		{
+			clazz:       Expression.PrefixedLiteral,
+			getTag:      () => "Symbolic.Local",
+			getLiteral:  () => this.messages.literalLocal,
+			getName:     () => this.messages.nameLocal,
+			color:       "orange",
+			bold:        true,
+			space:       10,
+			parentheses: false
+		}
+	);
 	
 	// λ and λ-builder
-	[ "Lambda", "LambdaBuilder" ].forEach(tag => Formulae.setExpression(module, "Symbolic." + tag, {
-		clazz:       Expression.Infix,
-		getTag:      () => "Symbolic." + tag,
-		getOperator: () => Symbolic.messages.operatorLambda,
-		getName:     () => Symbolic.messages["name" + tag],
-		color:       tag === "LambdaBuilder" ? "orange" : null,
-		inverted:    true,
-		min: 2, max: 2
-	}));
+	[ "Lambda", "LambdaBuilder" ].forEach(tag => Formulae.setExpression(
+		module,
+		"Symbolic." + tag,
+		{
+			clazz:       Expression.Infix,
+			getTag:      () => "Symbolic." + tag,
+			getOperator: () => Symbolic.messages.operatorLambda,
+			getName:     () => Symbolic.messages["name" + tag],
+			color:       tag === "LambdaBuilder" ? "orange" : null,
+			inverted:    true,
+			min: 2, max: 2
+		}
+	));
+	
+	// return
+	Formulae.setExpression(
+		module,
+		"Symbolic.Return",
+		{
+			clazz:       Expression.PrefixedLiteral,
+			getTag:      () => "Symbolic.Return",
+			getLiteral:  () => this.messages.literalReturn,
+			getName:     () => this.messages.nameReturn,
+			bold:        true,
+			space:       10,
+			parentheses: false
+		}
+	);
 	
 	// function
-	[ "Return", "Undefine" ].forEach(tag => Formulae.setExpression(module, "Symbolic." + tag, {
-		clazz:       Expression.Function,
-		getTag:      () => "Symbolic." + tag,
-		getMnemonic: () => Symbolic.messages["mnemonic" + tag],
-		getName:     () => Symbolic.messages["name" + tag],
-		parentheses: tag === "Return" ? false : null,
-		min: 1, max: 1
-	}));
+	//[ "Return", "Undefine" ].forEach(tag => Formulae.setExpression(
+	[ "Undefine" ].forEach(tag => Formulae.setExpression(
+		module,
+		"Symbolic." + tag,
+		{
+			clazz:       Expression.Function,
+			getTag:      () => "Symbolic." + tag,
+			getMnemonic: () => Symbolic.messages["mnemonic" + tag],
+			getName:     () => Symbolic.messages["name" + tag],
+			parentheses: tag === "Return" ? false : null,
+			min: 1, max: 1
+		}
+	));
 };
