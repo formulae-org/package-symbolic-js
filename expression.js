@@ -47,20 +47,20 @@ Symbolic.Symbol = class extends Expression.Literal {
 		super.get(name);
 	}
 	
-	setSerializationStrings(strings, promises) {
-		if (strings[0].length == 0) {
-			throw "Invalid name of symbol";
-		}
-
-		this.set("Name", strings[0]);
-	}
-	
 	getSerializationNames() {
 		return [ "Name" ];
 	}
 	
-	getSerializationStrings() {
+	async getSerializationStrings() {
 		return [ this.literal ];
+	}
+	
+	setSerializationStrings(strings, promises) {
+		if (strings[0].length == 0) {
+			throw "Invalid name of symbol";
+		}
+		
+		this.set("Name", strings[0]);
 	}
 	
 	isReduced() {
