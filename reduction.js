@@ -381,10 +381,8 @@ Symbolic.cardinalitySymbolReducer = async (count, session) => {
 	}
 	
 	count.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Integer(
-				BigInt(entry.getValue().children.length)
-			)
+		CanonicalArithmetic.createInternalNumber(
+			CanonicalArithmetic.createInteger(entry.getValue().children.length, session)
 		)
 	);
 	//session.log("Cardinality retrieved");
@@ -421,10 +419,8 @@ Symbolic.cardinalityChildSymbolReducer = async (count, session) => {
 	}
 	
 	count.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Integer(
-				BigInt(x.children.length)
-			)
+		CanonicalArithmetic.createInternalNumber(
+			CanonicalArithmetic.createInteger(x.children.length, session)
 		)
 	);
 	
@@ -525,7 +521,7 @@ Symbolic.insertSymbolReducer = async (insert, session) => {
 	let pos;
 	if (insert.children.length >= 3) {
 		let _N = await session.reduceAndGet(insert.children[2], 2);
-		pos = CanonicalArithmetic.getInteger(_N);
+		pos = CanonicalArithmetic.getNativeInteger(_N);
 		
 		if (pos === undefined) {
 			ReductionManager.setInError(_N, "Expression must be an integer number");
@@ -587,7 +583,7 @@ Symbolic.deleteSymbolReducer = async (deleteExpr, session) => {
 	// n
 	let _N = await session.reduceAndGet(deleteExpr.children[1], 1);
 	
-	let pos = CanonicalArithmetic.getInteger(_N);
+	let pos = CanonicalArithmetic.getNativeInteger(_N);
 	if (pos === undefined) {
 		ReductionManager.setInError(_N, "Expression is not an integer number");
 		throw new ReductionError();
@@ -791,6 +787,25 @@ Symbolic.assignmentPitfallReducer = async (assignmentExpression, session) => {
 	throw new ReductionError();
 };
 
+Symbolic.comparison = async (comparison, session) => {
+	if (
+		comparison.children[0].getTag() !== "Symbolic.Symbol" ||
+		comparison.children[1].getTag() !== "Symbolic.Symbol"
+	) {
+		return false;
+	}
+	
+	if (
+		comparison.children[0].getTag() === "Symbolic.Symbol" &&
+		comparison.children[1].getTag() === "Symbolic.Symbol" &&
+		comparison.children[0].get("Name") === comparison.children[1].get("Name")
+	) {
+		comparison.replaceBy(Formulae.createExpression("Relation.Comparison.Equals"));
+	}
+	
+	return true;
+};
+
 Symbolic.setReducers = () => {
 	ReductionManager.addReducer("Symbolic.Symbol",            Symbolic.symbolReducer,                 "Symbolic.symbolReducer");
 	ReductionManager.addReducer("Symbolic.Assignment",        Symbolic.assignmentSymbolReducer,       "Symbolic.assignmentSymbolReducer", { special: true });
@@ -813,4 +828,7 @@ Symbolic.setReducers = () => {
 	ReductionManager.addReducer("Symbolic.LambdaApplication", Symbolic.lambdaApplication,             "Symbolic.lambdaApplication");
 	ReductionManager.addReducer("Symbolic.LambdaBuilder",     Symbolic.lambdaBuilderReducer,          "Symbolic.lambdaBuilderReducer");
 	ReductionManager.addReducer("Symbolic.Assignment",        Symbolic.assignmentPitfallReducer,      "Symbolic.assignmentPitfallReducer", { precedence: ReductionManager.PRECEDENCE_LOW });
+	ReductionManager.addReducer("Relation.Compare",           Symbolic.comparison,                    "Symbolic.comparison");
+
 };
+
