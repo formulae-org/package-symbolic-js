@@ -382,7 +382,8 @@ Symbolic.cardinalitySymbolReducer = async (count, session) => {
 	
 	count.replaceBy(
 		CanonicalArithmetic.createInternalNumber(
-			CanonicalArithmetic.createInteger(entry.getValue().children.length, session)
+			CanonicalArithmetic.createInteger(entry.getValue().children.length, session),
+			session
 		)
 	);
 	//session.log("Cardinality retrieved");
@@ -420,7 +421,8 @@ Symbolic.cardinalityChildSymbolReducer = async (count, session) => {
 	
 	count.replaceBy(
 		CanonicalArithmetic.createInternalNumber(
-			CanonicalArithmetic.createInteger(x.children.length, session)
+			CanonicalArithmetic.createInteger(x.children.length, session),
+			session
 		)
 	);
 	
