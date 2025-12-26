@@ -167,8 +167,8 @@ Symbolic.childSymbolReducer = async (child, session) => {
 	//}
 	
 	child.replaceBy(result);
+	await session.reduce(result);
 	
-	//session.log("element extracted");
 	return true;
 };
 	
