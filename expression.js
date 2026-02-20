@@ -24,24 +24,35 @@ Symbolic.Symbol = class extends Expression.Literal {
 	constructor() {
 		super();
 		this.color = "blue";
+		this.reference = null;
 	}
-
+	
 	getTag() { return "Symbolic.Symbol"; }
 	getName() { return Symbolic.messages.nameSymbol; }
 	getLiteral() { return this.literal; }
-
+	
 	set(name, value) {
-		if (name == "Name") {
-			this.literal = value;
-		}
-		else {
-			super.set(name, value);
+		switch(name) {
+			case "Name":
+				this.literal = value;
+				break;
+			
+			case "Reference":
+				this.reference = value;
+				break;
+			
+			default:
+				super.set(name, value);
 		}
 	}
 	
 	get(name) {
-		if (name == "Name") {
-			return this.literal;
+		switch (name) {
+			case "Name":
+				return this.literal;
+				
+			case "Reference":
+				return this.reference;
 		}
 		
 		super.get(name);
@@ -90,13 +101,13 @@ Symbolic.FunctionExpression = class extends Expression.BinaryExpression {
 	getTag() { return "Symbolic.Function"; }
 	getName() { return Symbolic.messages.nameFunction; }
 	getChildName(index) { return Symbolic.messages.childrenFunction[index]; }
-
+	
 	prepareDisplay(context) {
 		let functionExpression = this.children[0];
 		let argumentsExpression = this.children[1];
 		
 		functionExpression.prepareDisplay(context);
-
+		
 		if (argumentsExpression.getTag() === "List.List") {
 			argumentsExpression.prepareDisplayAsList(context, 4, 4);
 		}
@@ -111,9 +122,9 @@ Symbolic.FunctionExpression = class extends Expression.BinaryExpression {
 			functionExpression.x += 4;
 			argumentsExpression.x += 4 + 4;
 		}
-
+		
 		this.width = argumentsExpression.x + argumentsExpression.width;
-
+		
 		this.vertBaseline = Math.round(this.width / 2);
 		this.horzBaseline = Math.max(functionExpression.horzBaseline, argumentsExpression.horzBaseline);
 		
@@ -134,7 +145,7 @@ Symbolic.FunctionExpression = class extends Expression.BinaryExpression {
 			functionExpression.drawParenthesesAround(context, x + functionExpression.x, y + functionExpression.y);
 		}
 		functionExpression.display(context, x + functionExpression.x, y + functionExpression.y);
-
+		
 		if (argumentsExpression.getTag() === "List.List") {
 			argumentsExpression.displayAsList(context, x + argumentsExpression.x, y + argumentsExpression.y);
 			this.drawParentheses(context, x + argumentsExpression.x,                             y + argumentsExpression.y, argumentsExpression.height, true );
@@ -146,21 +157,79 @@ Symbolic.FunctionExpression = class extends Expression.BinaryExpression {
 	}
 }
 
+Symbolic.Lambda = class extends Expression.BinaryExpression {
+	getTag() { return "Symbolic.Lambda"; }
+	getName() { return Symbolic.messages.nameLambda; }
+	getChildName(index) { return Symbolic.messages.childrenLambda[index]; }
+	
+	prepareDisplay(context) {
+		let parameters = this.children[0];
+		let body = this.children[1];
+		
+		parameters.prepareDisplay(context);
+		body.prepareDisplay(context);
+		
+		//let parenthesesBody = body.parenthesesAsOperator();
+		let parenthesesBody = false;
+		
+		this.horzBaseline = Math.round(Math.max(
+			parameters.horzBaseline,
+			body.horzBaseline,
+			context.fontInfo.semiHeight
+		));
+		let maxSemiHeight = Math.round(Math.max(
+			parameters.height - parameters.horzBaseline,
+			body.height - body.horzBaseline,
+			context.fontInfo.semiHeight
+		));
+		this.height = this.horzBaseline + maxSemiHeight;
+		
+		this.width = Math.round(context.measureText("λ").width) + 5;
+		parameters.x = this.width;
+		this.width += parameters.width + 5 + Math.round(context.measureText(".").width) + 5;
+		if (parenthesesBody) this.width += 4;
+		body.x = this.width;
+		this.width += body.width;
+		if (parenthesesBody) this.width += 4;
+		
+		this.vertBaseline = Math.round(this.width / 2);
+		
+		parameters.y = this.horzBaseline - parameters.horzBaseline;
+		body.y = this.horzBaseline - body.horzBaseline;
+	}
+	
+	display(context, x, y) {
+		let parameters = this.children[0];
+		let body = this.children[1];
+		
+		this.drawText(context, "λ", x, y + this.horzBaseline + context.fontInfo.semiHeight);
+		parameters.display(context, x + parameters.x, y + parameters.y);
+		
+		this.drawText(context, ".", x + parameters.x + parameters.width + 5, y + this.horzBaseline + context.fontInfo.semiHeight);
+		body.display(context, x + body.x, y + body.y);
+		
+		//if (body.parenthesesAsOperator()) {
+		//	body.drawParenthesesAround(context, x + body.x, y + body.y);
+		//}
+	}
+}
+
 Symbolic.LambdaApplication = class extends Expression.BinaryExpression {
 	getTag() { return "Symbolic.LambdaApplication"; }
 	getName() { return Symbolic.messages.nameLambdaApplication; }
 	getChildName(index) { return Symbolic.messages.childrenLambdaApplication[index]; }
-
+	
 	prepareDisplay(context) {
 		let left = this.children[0];
 		let right = this.children[1];
 		
 		left.prepareDisplay(context);
 		right.prepareDisplay(context);
-
-		let parenthesesLeft = left.parenthesesAsOperator() || left.parenthesesWhenSuperSubscripted();
-		let parenthesesRight = right.getTag() !== "List.List";
-
+		
+		let parenthesesLeft = left.parenthesesAsOperator() || left.parenthesesWhenSuperSubscripted() || left.getTag() === "Symbolic.Lambda";
+		//let parenthesesRight = right.getTag() !== "List.List";
+		let parenthesesRight = right.parenthesesAsOperator();
+		
 		this.width = 0;
 		if (parenthesesLeft) this.width += 4;
 		left.x = this.width;
@@ -187,12 +256,13 @@ Symbolic.LambdaApplication = class extends Expression.BinaryExpression {
 		let right = this.children[1];
 		
 		left.display(context, x + left.x, y + left.y);
-		if (left.parenthesesAsOperator() || left.parenthesesWhenSuperSubscripted()) {
+		if (left.parenthesesAsOperator() || left.parenthesesWhenSuperSubscripted() || left.getTag() === "Symbolic.Lambda") {
 			left.drawParenthesesAround(context, x + left.x, y + left.y);
 		}
 		
 		right.display(context, x + right.x, y + right.y);
-		if (right.getTag() !== "List.List") {
+		//if (right.getTag() !== "List.List") {
+		if (right.parenthesesAsOperator()) {
 			right.drawParenthesesAround(context, x + right.x, y + right.y);
 		}
 	}
@@ -201,6 +271,7 @@ Symbolic.LambdaApplication = class extends Expression.BinaryExpression {
 Symbolic.setExpressions = function(module) {
 	Formulae.setExpression(module, "Symbolic.Symbol",            Symbolic.Symbol);
 	Formulae.setExpression(module, "Symbolic.Function",          Symbolic.FunctionExpression);
+	Formulae.setExpression(module, "Symbolic.Lambda",            Symbolic.Lambda);
 	Formulae.setExpression(module, "Symbolic.LambdaApplication", Symbolic.LambdaApplication);
 	
 	// assignment
@@ -236,7 +307,8 @@ Symbolic.setExpressions = function(module) {
 	);
 	
 	// λ and λ-builder
-	[ "Lambda", "LambdaBuilder" ].forEach(tag => Formulae.setExpression(
+	//[ "Lambda", "LambdaBuilder" ].forEach(tag => Formulae.setExpression(
+	[ "LambdaBuilder" ].forEach(tag => Formulae.setExpression(
 		module,
 		"Symbolic." + tag,
 		{
@@ -280,3 +352,4 @@ Symbolic.setExpressions = function(module) {
 		}
 	));
 };
+
