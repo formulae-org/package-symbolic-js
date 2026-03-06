@@ -87,6 +87,12 @@ Symbolic.setEditions = function() {
 	Formulae.addEdition(this.messages.pathSymbolic, null, this.messages.leafLambda,            () => Expression.binaryEdition ("Symbolic.Lambda", false));
 	Formulae.addEdition(this.messages.pathSymbolic, null, this.messages.leafLambdaApplication, () => Expression.binaryEdition ("Symbolic.LambdaApplication", false));
 	Formulae.addEdition(this.messages.pathSymbolic, null, this.messages.leafLambdaBuilder,     () => Expression.binaryEdition ("Symbolic.LambdaBuilder", false));
+	
+	// functional strictness
+	
+	Formulae.addEdition(this.messages.pathOptions, null, this.messages.leafWithFunctionalStrictness, () => Expression.wrapperEdition("Symbolic.WithFunctionalStrictness"));
+	Formulae.addEdition(this.messages.pathOptions, null, this.messages.leafHasFunctionalStrictness,  () => Expression.replacingEdition("Symbolic.HasFunctionalStrictness"));
+	Formulae.addEdition(this.messages.pathOptions, null, this.messages.leafSetFunctionalStrictness,  () => Expression.wrapperEdition("Symbolic.SetFunctionalStrictness"));
 };
 
 Symbolic.setActions = function() {

@@ -37,6 +37,21 @@
 
 	"nameUndefine"     : "Undefinition",
 	"mnemonicUndefine" : "Undefine",
-	"leafUndefine"     : "Undefine"
+	"leafUndefine"     : "Undefine",
+	
+	"pathOptions" : "Symbolic.Options",
+	
+	"mnemonicWithFunctionalStrictness" : "WithFunctionalStrictness",
+	"nameWithFunctionalStrictness"     : "With functional strictness",
+	"leafWithFunctionalStrictness"     : "With functional strictness",
+	"childrenWithFunctionalStrictness" : [ "Argument", "Functional strictness flag" ],
+	
+	"mnemonicHasFunctionalStrictness" : "HasFunctionalStrictness",
+	"labelHasFunctionalStrictness"    : "Has functional strictness",
+	"leafHasFunctionalStrictness"     : "Has functional strictness",
+	
+	"mnemonicSetFunctionalStrictness" : "SetFunctionalStrictness",
+	"labelSetFunctionalStrictness"    : "Set functional strictness",
+	"leafSetFunctionalStrictness"     : "Set functional strictness"
 }
 

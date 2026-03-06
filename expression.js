@@ -24,7 +24,7 @@ Symbolic.Symbol = class extends Expression.Literal {
 	constructor() {
 		super();
 		this.color = "blue";
-		this.reference = null;
+		this.scopeEntry = null;
 	}
 	
 	getTag() { return "Symbolic.Symbol"; }
@@ -37,8 +37,8 @@ Symbolic.Symbol = class extends Expression.Literal {
 				this.literal = value;
 				break;
 			
-			case "Reference":
-				this.reference = value;
+			case "ScopeEntry":
+				this.scopeEntry = value;
 				break;
 			
 			default:
@@ -51,8 +51,8 @@ Symbolic.Symbol = class extends Expression.Literal {
 			case "Name":
 				return this.literal;
 				
-			case "Reference":
-				return this.reference;
+			case "ScopeEntry":
+				return this.scopeEntry;
 		}
 		
 		super.get(name);
@@ -157,63 +157,6 @@ Symbolic.FunctionExpression = class extends Expression.BinaryExpression {
 	}
 }
 
-Symbolic.Lambda = class extends Expression.BinaryExpression {
-	getTag() { return "Symbolic.Lambda"; }
-	getName() { return Symbolic.messages.nameLambda; }
-	getChildName(index) { return Symbolic.messages.childrenLambda[index]; }
-	
-	prepareDisplay(context) {
-		let parameters = this.children[0];
-		let body = this.children[1];
-		
-		parameters.prepareDisplay(context);
-		body.prepareDisplay(context);
-		
-		//let parenthesesBody = body.parenthesesAsOperator();
-		let parenthesesBody = false;
-		
-		this.horzBaseline = Math.round(Math.max(
-			parameters.horzBaseline,
-			body.horzBaseline,
-			context.fontInfo.semiHeight
-		));
-		let maxSemiHeight = Math.round(Math.max(
-			parameters.height - parameters.horzBaseline,
-			body.height - body.horzBaseline,
-			context.fontInfo.semiHeight
-		));
-		this.height = this.horzBaseline + maxSemiHeight;
-		
-		this.width = Math.round(context.measureText("λ").width) + 5;
-		parameters.x = this.width;
-		this.width += parameters.width + 5 + Math.round(context.measureText(".").width) + 5;
-		if (parenthesesBody) this.width += 4;
-		body.x = this.width;
-		this.width += body.width;
-		if (parenthesesBody) this.width += 4;
-		
-		this.vertBaseline = Math.round(this.width / 2);
-		
-		parameters.y = this.horzBaseline - parameters.horzBaseline;
-		body.y = this.horzBaseline - body.horzBaseline;
-	}
-	
-	display(context, x, y) {
-		let parameters = this.children[0];
-		let body = this.children[1];
-		
-		this.drawText(context, "λ", x, y + this.horzBaseline + context.fontInfo.semiHeight);
-		parameters.display(context, x + parameters.x, y + parameters.y);
-		
-		this.drawText(context, ".", x + parameters.x + parameters.width + 5, y + this.horzBaseline + context.fontInfo.semiHeight);
-		body.display(context, x + body.x, y + body.y);
-		
-		//if (body.parenthesesAsOperator()) {
-		//	body.drawParenthesesAround(context, x + body.x, y + body.y);
-		//}
-	}
-}
-
 Symbolic.LambdaApplication = class extends Expression.BinaryExpression {
 	getTag() { return "Symbolic.LambdaApplication"; }
 	getName() { return Symbolic.messages.nameLambdaApplication; }
@@ -271,7 +214,6 @@ Symbolic.LambdaApplication = class extends Expression.BinaryExpression {
 Symbolic.setExpressions = function(module) {
 	Formulae.setExpression(module, "Symbolic.Symbol",            Symbolic.Symbol);
 	Formulae.setExpression(module, "Symbolic.Function",          Symbolic.FunctionExpression);
-	Formulae.setExpression(module, "Symbolic.Lambda",            Symbolic.Lambda);
 	Formulae.setExpression(module, "Symbolic.LambdaApplication", Symbolic.LambdaApplication);
 	
 	// assignment
@@ -307,8 +249,7 @@ Symbolic.setExpressions = function(module) {
 	);
 	
 	// λ and λ-builder
-	//[ "Lambda", "LambdaBuilder" ].forEach(tag => Formulae.setExpression(
-	[ "LambdaBuilder" ].forEach(tag => Formulae.setExpression(
+	[ "Lambda", "LambdaBuilder" ].forEach(tag => Formulae.setExpression(
 		module,
 		"Symbolic." + tag,
 		{
@@ -337,7 +278,6 @@ Symbolic.setExpressions = function(module) {
 		}
 	);
 	
-	// function
 	//[ "Return", "Undefine" ].forEach(tag => Formulae.setExpression(
 	[ "Undefine" ].forEach(tag => Formulae.setExpression(
 		module,
@@ -351,5 +291,32 @@ Symbolic.setExpressions = function(module) {
 			min: 1, max: 1
 		}
 	));
+	
+	// Functional strictness
+	
+	Formulae.setExpression(module, "Symbolic.WithFunctionalStrictness", {
+		clazz:        Expression.Function,
+		getTag:       () => "Symbolic.WithFunctionalStrictness",
+		getMnemonic:  () => Symbolic.messages.mnemonicWithFunctionalStrictness,
+		getName:      () => Symbolic.messages.nameWithFunctionalStrictness,
+		getChildName: index => Symbolic.messages.childrenWithFunctionalStrictness[index],
+		min: 1, max: 2
+	});
+	
+	Formulae.setExpression(module, "Symbolic.HasFunctionalStrictness", {
+		clazz:       Expression.Function,
+		getTag:      () => "Symbolic.HasFunctionalStrictness",
+		getMnemonic: () => Symbolic.messages.mnemonicHasFunctionalStrictness,
+		getName:     () => Symbolic.messages.nameHasFunctionalStrictness,
+		min: 0, max: 0
+	});
+	
+	Formulae.setExpression(module, "Symbolic.SetFunctionalStrictness", {
+		clazz:       Expression.Function,
+		getTag:      () => "Symbolic.SetFunctionalStrictness",
+		getMnemonic: () => Symbolic.messages.mnemonicSetFunctionalStrictness,
+		getName:     () => Symbolic.messages.nameSetFunctionalStrictness,
+		min: 0, max: 1
+	});
 };
 
