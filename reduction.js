@@ -402,14 +402,14 @@ Symbolic.cardinalityChildSymbolReducer = async (count, session) => {
 Symbolic.returnReducer = async (expr, session) => {
 	throw new Symbolic.ReturnError("", { cause: expr.children[0] });
 };
-	
+
 // Append(symbol, expr)[special, high]
 
 // it must be special in order to prevent symbol reduction
 // It must be high precedence to have priority over other forms, specially Expression.Append(e1, e2)
 //
 // See: Expression.Append(e1, e2)
-	
+
 Symbolic.appendSymbolReducer = async (_append, session) => {
 	let symbol = _append.children[0];
 	if (symbol.getTag() !== "Symbolic.Symbol") {
@@ -436,7 +436,7 @@ Symbolic.appendSymbolReducer = async (_append, session) => {
 	//session.log("Expression appended");
 	return true;
 };
-	
+
 // Prepend(symbol, expr)[special, high]
 // it must be special in order to prevent symbol reduction
 // It must be high precedence to have priority over other forms, specially Expression.Prepend(e1, e2)
@@ -469,13 +469,13 @@ Symbolic.prependSymbolReducer = async (prepend, session) => {
 	//session.log("expression prepended");
 	return true;
 };
-	
+
 // Insert(symbol, expr, pos)
 // it must be special in order to prevent symbol reduction
 // It must be high precedence to have priority over other forms, specially Expression.Insert(e1, e2, pos)
 //
 // See: Expression.Insert(e1, e2, pos)
-	
+
 Symbolic.insertSymbolReducer = async (insert, session) => {
 	// symbol
 	let symbol = insert.children[0];
@@ -531,13 +531,13 @@ Symbolic.insertSymbolReducer = async (insert, session) => {
 	//session.log("Expression inserted");
 	return true;
 };
-	
+
 // Delete(symbol, pos)
 // it must be special in order to prevent symbol reduction
 // It must be high precedence to have priority over other forms, specially Expression.Delete(expr, pos)
 //
 // See: Expression.Delete(expr, pos)
-	
+
 Symbolic.deleteSymbolReducer = async (deleteExpr, session) => {
 	// symbol
 	let symbol = deleteExpr.children[0];
@@ -587,14 +587,6 @@ Symbolic.deleteSymbolReducer = async (deleteExpr, session) => {
 /////////////////////
 // Functional part //
 /////////////////////
-
-
-// Functional strictness: Lambda application by substitution, as lambda calculus imposes.
-// It is stateless and hence does not work well with variables and parameters as variables
-//                                                                                                                           //
-// Non Functional strictness: Lambda application with parameters as variables (the values of parameters can be then changed) //
-
-
 
 // f(arg1, arg2, ..., argn)   <-   body
 // function(f, {arg1, arg2, ..., argn})   <-   body
@@ -678,7 +670,7 @@ Symbolic.functionReducer = async (f, session) => {
 // Lambda(arguments, expr)
 // it must be special in order to prevent symbol reduction
 // It does nothing
-	
+
 Symbolic.lambdaReducer = async (lambda, session) => {
 	/////
 	//session.log("Lambda expression");
@@ -698,22 +690,6 @@ Symbolic.getNextIdentifier = () => {
 	++Symbolic.identifier;
 	return Symbolic.identifier;
 }
-
-/*
-Symbolic.replaceSymbol = (expr, from, to) => {
-	if (expr.getTag() === "Symbolic.Symbol") {
-		let name = expr.get("Name");
-		if (name === from) {
-			expr.set("Name", to);
-		}
-	}
-	else {
-		for (let i = 0, n = expr.children.length; i < n; ++i) {
-			Symbolic.replaceSymbol(expr.children[i], from, to);
-		}
-	}
-};
-*/
 
 // parameters:
 //		expr: The expression to apply changes
@@ -862,155 +838,64 @@ Symbolic.lambdaApplication = async (app, session) => {
 	
 	///////////////////////
 	
-	if (!session.functionalStrictness) {
-		/*
-		let createVariable = (block, parameter, value) => {
-			if (parameter.getTag() !== "Symbolic.Symbol") {
-				ReductionManager.setInError(parameter, "Expression must be a symbol");
-				throw new ReductionError();
-			}
-			
-			let symbolName = parameter.get("Name");
-			let newSymbolName = Symbolic.FULL_SUBSTITUTION ? symbolName + "_" + Symbolic.getNextIdentifier() : symbolName + "_";
-			//let newSymbolName = symbolName;
-			//let newSymbolName = symbolName + "_";
-			
-			//parameter = parameter.clone();
-			parameter.set("Name", newSymbolName);
-			
-			let assignment = Formulae.createExpression("Symbolic.Assignment");
-			assignment.addChild(parameter);
-			assignment.addChild(value);
-			
-			let local = Formulae.createExpression("Symbolic.Local");
-			local.addChild(assignment);
-			
-			block.addChild(local);
-			
-			Symbolic.replaceSymbol(body, symbolName, newSymbolName, value, true);
-		};
-		*/
-		
-		let createVariable = (block, parameter, value) => {
-			if (parameter.getTag() !== "Symbolic.Symbol") {
-				ReductionManager.setInError(parameter, "Expression must be a symbol");
-				throw new ReductionError();
-			}
-			
-			let symbolName = parameter.get("Name");
-			let newSymbolName = Symbolic.FULL_SUBSTITUTION ? symbolName + "_" + Symbolic.getNextIdentifier() : symbolName + "_";
-			
-			let scopeEntry = new ScopeEntry(value);
-			block.putIntoScope(newSymbolName, scopeEntry, false); // global = false
-			
-			Symbolic.replaceSymbol(body, symbolName, newSymbolName, value, true, scopeEntry);
-		};
-		
-		if (parameters.getTag() === "List.List") {
-			if (values.children.length > 0) {
-				let block = Formulae.createExpression("Programming.Block");
-				for (let i = 0, n = values.children.length; i < n; ++i) {
-					createVariable(block, parameters.children[i].clone(), values.children[i].clone());
-				}
-				block.addChild(body);
-				body = block;
-			}
+	let createVariable = (block, parameter, value) => {
+		if (parameter.getTag() !== "Symbolic.Symbol") {
+			ReductionManager.setInError(parameter, "Expression must be a symbol");
+			throw new ReductionError();
 		}
-		else {
+		
+		let symbolName = parameter.get("Name");
+		let newSymbolName = Symbolic.FULL_SUBSTITUTION ? symbolName + "_" + Symbolic.getNextIdentifier() : symbolName + "_";
+		
+		let scopeEntry = new ScopeEntry(value);
+		block.putIntoScope(newSymbolName, scopeEntry, false); // global = false
+		
+		Symbolic.replaceSymbol(body, symbolName, newSymbolName, value, true, scopeEntry);
+	};
+	
+	if (parameters.getTag() === "List.List") {
+		if (values.children.length > 0) {
 			let block = Formulae.createExpression("Programming.Block");
-			createVariable(block, parameters.clone(), values.clone());
+			for (let i = 0, n = values.children.length; i < n; ++i) {
+				createVariable(block, parameters.children[i].clone(), values.children[i].clone());
+			}
 			block.addChild(body);
 			body = block;
 		}
-		
-		////////////////////////////////////////////////
-		// Total or parcial application of parameters //
-		////////////////////////////////////////////////
-		
-		if (singleSymbol) {
-			app.replaceBy(body);
-		}
-		else if (parameters.children.length === values.children.length) { // total application
-			app.replaceBy(body);
-		}
-		else { // partial application
-			for (let i = 0, n = values.children.length; i < n; ++i) {
-				parameters.removeChildAt(0);
-			}
-			
-			// TODO (disable for Church numerals with lambda builders)
-			// resulting number of parameters is 1, the list in unwrapped
-			//if (parameters.children.length === 1) {
-			//	lambda.setChild(0, parameters.children[0]);
-			//}
-			
-			lambda.setChild(1, body);
-			
-			app.replaceBy(lambda);
-			
-			body = lambda;
-		}
 	}
 	else {
-		/*
+		let block = Formulae.createExpression("Programming.Block");
+		createVariable(block, parameters.clone(), values.clone());
+		block.addChild(body);
+		body = block;
+	}
+	
+	////////////////////////////////////////////////
+	// Total or parcial application of parameters //
+	////////////////////////////////////////////////
+	
+	if (singleSymbol) {
 		app.replaceBy(body);
+	}
+	else if (parameters.children.length === values.children.length) { // total application
+		app.replaceBy(body);
+	}
+	else { // partial application
+		for (let i = 0, n = values.children.length; i < n; ++i) {
+			parameters.removeChildAt(0);
+		}
 		
-		if (singleSymbol) {
-			Symbolic.replaceSymbol(body, parameters.get("Name"), values, null, false);
-		}
-		else {
-			let symbol;
-			for (let i = 0, n = values.children.length; i < n; ++i) {
-				symbol = parameters.children[i];
-				if (symbol.getTag() !== "Symbolic.Symbol") {
-					ReductionManager.setInError(symbol, "Expression must be a symbol");
-					throw new ReductionError();
-				}
-				
-				Symbolic.replaceSymbol(body, symbol.get("Name"), values.children[i], null, false);
-			}
-		}
-		*/
+		// TODO (disable for Church numerals with lambda builders)
+		// resulting number of parameters is 1, the list in unwrapped
+		//if (parameters.children.length === 1) {
+		//	lambda.setChild(0, parameters.children[0]);
+		//}
 		
-		if (singleSymbol) {
-			app.replaceBy(body);
-			Symbolic.replaceSymbol(body, parameters.get("Name"), values, null, false);
-		}
-		else if (parameters.children.length === values.children.length) { // total application
-			app.replaceBy(body);
-			
-			let symbol;
-			for (let i = 0, n = values.children.length; i < n; ++i) {
-				symbol = parameters.children[i];
-				if (symbol.getTag() !== "Symbolic.Symbol") {
-					ReductionManager.setInError(symbol, "Expression must be a symbol");
-					throw new ReductionError();
-				}
-				
-				Symbolic.replaceSymbol(body, symbol.get("Name"), values.children[i], null, false);
-			}
-		}
-		else {
-			lambda.setChild(1, body);
-			
-			let symbol;
-			for (let i = 0, n = values.children.length; i < n; ++i) {
-				symbol = parameters.children[i];
-				if (symbol.getTag() !== "Symbolic.Symbol") {
-					ReductionManager.setInError(symbol, "Expression must be a symbol");
-					throw new ReductionError();
-				}
-				
-				Symbolic.replaceSymbol(body, symbol.get("Name"), values.children[i], null, false);
-			}
-			
-			for (let i = 0, n = values.children.length; i < n; ++i) {
-				parameters.removeChildAt(0);
-			}
-			
-			app.replaceBy(lambda);
-			body = lambda;
-		}
+		lambda.setChild(1, body);
+		
+		app.replaceBy(lambda);
+		
+		body = lambda;
 	}
 	
 	//////////////////////////////////////////
@@ -1079,64 +964,6 @@ Symbolic.lambdaBuilderReducer = async (lambdaCreation, session) => {
 	return true;
 };
 
-const withFunctionalStrictness = async (w, session) => {
-	if (session.functionalStrictness === undefined) session.functionalStrictness = false;
-	
-	let value = true;
-	
-	if (w.children.length >= 2) {
-		let expr = await session.reduceAndGet(w.children[1], 1);
-		let tag = expr.getTag();
-		
-		if (tag !== "Logic.True" && tag !== "Logic.False") {
-			ReductionManager.setInError(w.children[1], "Expression must be a boolean");
-			throw new ReductionError();
-		}
-		value = tag === "Logic.True";
-	}
-	
-	let bkpFunctionalStrictness = session.functionalStrictness;
-	session.functionalStrictness = value;
-	
-	await session.reduce(w.children[0]);
-	
-	session.functionalStrictness = bkpFunctionalStrictness;
-	
-	w.replaceBy(w.children[0]);
-	return true;
-};
-
-const hasFunctionalStrictness = async (has, session) => {
-	if (session.functionalStrictness === undefined) session.functionalStrictness = false;
-	
-	has.replaceBy(
-		Formulae.createExpression(
-			session.functionalStrictness ? "Logic.True" : "Logic.False"
-		)
-	);
-	return true;
-};
-
-const setFunctionalStrictness = async (set, session) => {
-	if (session.functionalStrictness === undefined) session.functionalStrictness = false;
-	
-	let value = true;
-	
-	if (set.children.length >= 1) {
-		let expr = await session.reduceAndGet(set.children[0], 0);
-		let tag = expr.getTag();
-		
-		if (tag !== "Logic.True" && tag !== "Logic.False") {
-			ReductionManager.setInError(set.children[0], "Expression must be a boolean");
-			throw new ReductionError();
-		}
-		value = tag === "Logic.True";
-	}
-	
-	session.functionalStrictness = value;
-	return true;
-};
-
 // Assignment pitfall reducer
 // Assignment(e1, e2)[low]
 // It must be low precedence to be a pitfall for no valid forms of assignment
@@ -1190,11 +1017,5 @@ Symbolic.setReducers = () => {
 	ReductionManager.addReducer("Symbolic.LambdaBuilder",     Symbolic.lambdaBuilderReducer,          "Symbolic.lambdaBuilderReducer");
 	ReductionManager.addReducer("Symbolic.Assignment",        Symbolic.assignmentPitfallReducer,      "Symbolic.assignmentPitfallReducer", { precedence: ReductionManager.PRECEDENCE_LOW });
 	ReductionManager.addReducer("Relation.Compare",           Symbolic.comparison,                    "Symbolic.comparison");
-	
-	// Functional strictness
-	
-	ReductionManager.addReducer("Symbolic.WithFunctionalStrictness", withFunctionalStrictness, "Symbolic.withFunctionalStrictness", { special: true });
-	ReductionManager.addReducer("Symbolic.HasFunctionalStrictness",  hasFunctionalStrictness,  "Symbolic.hasFunctionalStrictness");
-	ReductionManager.addReducer("Symbolic.SetFunctionalStrictness",  setFunctionalStrictness,  "Symbolic.setFunctionalStrictness");
 };
 

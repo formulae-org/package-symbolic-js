@@ -291,32 +291,5 @@ Symbolic.setExpressions = function(module) {
 			min: 1, max: 1
 		}
 	));
-	
-	// Functional strictness
-	
-	Formulae.setExpression(module, "Symbolic.WithFunctionalStrictness", {
-		clazz:        Expression.Function,
-		getTag:       () => "Symbolic.WithFunctionalStrictness",
-		getMnemonic:  () => Symbolic.messages.mnemonicWithFunctionalStrictness,
-		getName:      () => Symbolic.messages.nameWithFunctionalStrictness,
-		getChildName: index => Symbolic.messages.childrenWithFunctionalStrictness[index],
-		min: 1, max: 2
-	});
-	
-	Formulae.setExpression(module, "Symbolic.HasFunctionalStrictness", {
-		clazz:       Expression.Function,
-		getTag:      () => "Symbolic.HasFunctionalStrictness",
-		getMnemonic: () => Symbolic.messages.mnemonicHasFunctionalStrictness,
-		getName:     () => Symbolic.messages.nameHasFunctionalStrictness,
-		min: 0, max: 0
-	});
-	
-	Formulae.setExpression(module, "Symbolic.SetFunctionalStrictness", {
-		clazz:       Expression.Function,
-		getTag:      () => "Symbolic.SetFunctionalStrictness",
-		getMnemonic: () => Symbolic.messages.mnemonicSetFunctionalStrictness,
-		getName:     () => Symbolic.messages.nameSetFunctionalStrictness,
-		min: 0, max: 1
-	});
 };
 
