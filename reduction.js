@@ -910,7 +910,7 @@ Symbolic.lambdaApplication = async (app, session) => {
 	}
 	catch (error) {
 		if (error instanceof Symbolic.ReturnError) {
-			result.replaceBy(error.cause);
+			body.replaceBy(error.cause);
 		}
 		else {
 			throw error;
