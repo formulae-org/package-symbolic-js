@@ -28,7 +28,7 @@
 	"leafLambdaBuilder" : "Constructor lambda",
 	
 	"nameLambdaApplication"     : "Aplicación lambda",
-	"childrenLambdaApplication" : [ "Expression lambda", "Parámeteros a aplicar" ],
+	"childrenLambdaApplication" : [ "Expresión lambda", "Parámetros a aplicar" ],
 	"leafLambdaApplication"     : "Aplicación lambda",
 	
 	"nameReturn"    : "Regresar",
