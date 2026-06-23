@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-'use strict';
+"use strict";
 
 export class Symbolic extends Formulae.Package {}
 
@@ -244,7 +244,7 @@ Symbolic.assignmentChildSymbolReducer = async (assignment, session) => {
 // { LOCAL l1 <- r1, LOCAL l2 <- r2, ..., LOCAL ln <- rn }
 //
 // it must be special reducer in order to prevent symbol reduction
-	
+
 Symbolic.localArrayReducer = async (local, session) => {
 	let child = local.children[0];
 	let tag;
@@ -305,16 +305,16 @@ Symbolic.localArrayReducer = async (local, session) => {
 	
 	return false; // Ok, forward to other forms of assignment
 };
-	
+
 Symbolic.localReducer = async (local, session) => {
 	local.replaceBy(local.children[0]);
 	//session.log("Local definition");
 	return true;
 };
-	
+
 // Undefine(symbol)
 // it must be pre-reducer in order to prevent symbol reduction
-	
+
 Symbolic.undefineReducer = async (undefine, session) => {
 	let symbol = undefine.children[0];
 	
@@ -359,11 +359,11 @@ Symbolic.cardinalitySymbolReducer = async (count, session) => {
 	//session.log("Cardinality retrieved");
 	return true;
 };
-	
+
 // Cardinality(symbol)
 //			        spec
 // it must be pre-reducer in order to prevent symbol reduction
-	
+
 Symbolic.cardinalityChildSymbolReducer = async (count, session) => {
 	let child = count.children[0];
 	
@@ -398,7 +398,7 @@ Symbolic.cardinalityChildSymbolReducer = async (count, session) => {
 	
 	return true;
 };
-	
+
 Symbolic.returnReducer = async (expr, session) => {
 	throw new Symbolic.ReturnError("", { cause: expr.children[0] });
 };
@@ -442,7 +442,7 @@ Symbolic.appendSymbolReducer = async (_append, session) => {
 // It must be high precedence to have priority over other forms, specially Expression.Prepend(e1, e2)
 //
 // See: Expression.Prepend(e1, e2)
-	
+
 Symbolic.prependSymbolReducer = async (prepend, session) => {
 	let symbol = prepend.children[0];
 	if (symbol.getTag() !== "Symbolic.Symbol") {
@@ -759,7 +759,7 @@ Symbolic.replaceSymbol = (expr, name, to, value, renaming, scopeEntry) => {
 				}
 			}
 		}
-			
+		
 		// The symbol is not in the parameter list of the function
 		// so, the symbol is free in the body of the function
 		// it is safe to substitute the symbol by its value in the body of function
@@ -967,7 +967,7 @@ Symbolic.lambdaBuilderReducer = async (lambdaCreation, session) => {
 // Assignment pitfall reducer
 // Assignment(e1, e2)[low]
 // It must be low precedence to be a pitfall for no valid forms of assignment
-	
+
 Symbolic.assignmentPitfallReducer = async (assignmentExpression, session) => {
 	ReductionManager.setInError(assignmentExpression, "Invalid assignment");
 	throw new ReductionError();

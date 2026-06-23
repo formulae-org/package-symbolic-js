@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-'use strict';
+"use strict";
 
 export class Symbolic extends Formulae.Package {}
 
@@ -32,7 +32,7 @@ Symbolic.Symbol = class extends Expression.Literal {
 	getLiteral() { return this.literal; }
 	
 	set(name, value) {
-		switch(name) {
+		switch (name) {
 			case "Name":
 				this.literal = value;
 				break;
